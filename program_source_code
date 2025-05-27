@@ -1,0 +1,2219 @@
+#include <iostream>
+#include <string>
+#include <string.h>
+#include <cstdlib>
+#include <iomanip> // Для setw
+#include <cmath>
+
+#define sleep_sec 10
+#define line_width 16
+
+using namespace std;
+
+struct condition_outside {
+    double temperature;
+    int humidity; // влажн
+    int air_quality;
+    int pressure; // рт ст , для точки росы
+    double precipitation;
+    double wind;
+};
+
+struct condition_inside {
+    double temperature;
+    int humidity; // влажн
+    int air_quality;
+};
+
+struct emergency_alert {
+    bool tsunami;
+    bool forest_fire;
+    bool earthquake;
+    bool storm;
+};
+
+struct operating_mode_of_systems {
+    bool gas;
+    bool water;
+    bool electricity;
+    bool generator;
+    bool windows[10] = { false };
+    bool doors[10] = { false };
+    bool basement_water_pump;
+    bool drainage_system;
+    bool street_air_intake;
+    bool room_ventilation_without_air_intake;
+    bool heating[10] = { false };
+    bool room_cooling[10] = { false };
+    bool humidity_regulation[10] = { false };
+    int user_notification_code[20] = { 0 };
+    string user_notifications[20] = { "" };
+}; // systems
+
+void system_initialization(condition_outside& outside, condition_inside& inside, emergency_alert& alert, operating_mode_of_systems& mode_of_systems, condition_inside& desired_parametres) {
+
+    inside.temperature = 19.5;
+    inside.humidity = 20;
+    inside.air_quality = 15;
+
+    desired_parametres.temperature = 20;
+    desired_parametres.humidity = 20;
+    desired_parametres.air_quality = 15;
+
+
+    outside.temperature = 17;
+    outside.humidity = 32;
+    outside.air_quality = 21;
+    outside.pressure = 760;
+    outside.precipitation = 0;
+    outside.wind = 0;
+
+    alert.tsunami = 0;
+    alert.forest_fire = 0;
+    alert.earthquake = 0;
+    alert.storm = 0;
+
+    mode_of_systems.gas = 1;
+    mode_of_systems.water = 1;
+    mode_of_systems.electricity = 1;
+    mode_of_systems.generator = 0;
+    mode_of_systems.windows[0] = 0;
+    mode_of_systems.doors[0] = 0;
+    mode_of_systems.basement_water_pump = 0;
+    mode_of_systems.drainage_system = 0;
+    mode_of_systems.street_air_intake = 1;
+    mode_of_systems.room_ventilation_without_air_intake = 0;
+    mode_of_systems.heating[0] = 0;
+    mode_of_systems.room_cooling[0] = 0;
+    mode_of_systems.humidity_regulation[0] = 0;
+    //mode_of_systems.user_notification_code[0] = { 0 };
+}
+
+void print_top_line() {
+    cout << "+----------------+----------------+----------------+----------------+----------------+----------------+----------------+\n";
+}
+
+void print_table(condition_outside& outside, condition_inside& inside, emergency_alert& alert, operating_mode_of_systems& mode_of_systems, condition_inside& desired_parametres) {
+    //system("cls");
+    print_top_line();
+    cout << "|" << setw(line_width) << " "
+        << "|" << setw(line_width - 1) << "°C Temperature"
+        << " |" << setw(line_width) << "Humidity "
+        << "|" << setw(line_width) << "Air quality "
+        << "|" << setw(line_width) << "mmHg Pressure "
+        << "|" << setw(line_width) << "Precipitation "
+        << "|" << setw(line_width - 1) << "m/s Wind " << " |\n";
+    print_top_line();
+    cout << "|" << setw(line_width) << " Outside  " << "|";
+    printf("%16.1f|%16d|%16d|%16d|%16.1f|%16.1f|\n", outside.temperature, outside.humidity, outside.air_quality, outside.pressure, outside.precipitation, outside.wind);
+    print_top_line();
+    cout << "|" << setw(line_width) << " Intside  " << "|";
+    printf("%16.1f|%16d|%16d|%16d|", inside.temperature, inside.humidity, inside.air_quality, outside.pressure);
+    cout << setw(line_width * 2) << " " << " |\n";
+    cout << "+----------------+----------------+----------------+----------------+----------------+";
+    cout << setw(line_width * 2 + 2) << "+" << "\n";
+    cout << "|" << setw(line_width * 7 + 5) << " " << " |\n";
+    //cout << "+--------------+--------------+--------------+--------------+--------------+-------------+--------------+--------------+\n";
+    cout << "+--------------------------------------------------------------------------+-------------+-----------------------------+\n";
+
+    cout << "|" << setw(line_width * 2 + 13) << "Emergency alert" << setw(line_width * 1 + 14) << "|" << setw(line_width * 1 - 4) << " " <<
+        " | " << setw(line_width * 1 + 7) << "Desired parameters" << setw(line_width * 1 - 11) << " " << "|\n";
+
+    cout << "+--------------+--------------+--------------+--------------+--------------+             +--------------+--------------+\n";
+    cout << "|" << setw(line_width - 2) << "Tsunami" << "|" << setw(line_width - 2) << (alert.tsunami ? "Yes" : "No") << "|" << setw(line_width - 1) << " |";
+
+    cout << setw(line_width - 2) << "Earthquake" << "|" << setw(line_width - 2) << (alert.earthquake ? "Yes" : "No") << "|" << setw(line_width - 2) << " |"
+        << "°C Temperature|" << setw(line_width - 2) << desired_parametres.temperature << "|" << endl;                                                                                             // dodel
+
+    cout << "+--------------+--------------+              +--------------+--------------+             +--------------+--------------+\n";
+
+    cout << "|" << setw(line_width - 2) << "Forest fire" << "|" << setw(line_width - 2) << (alert.forest_fire ? "Yes" : "No") << "|" << setw(line_width - 1) << " |";
+
+    cout << setw(line_width - 2) << "Storm" << "|" << setw(line_width - 2) << (alert.storm ? "Yes" : "No") << "|" << setw(line_width - 2) << " |"
+        << setw(line_width - 1) << "Humidity|" << setw(line_width - 2) << desired_parametres.humidity << "|" << endl;                                                                         // dodel
+    cout << "+--------------+--------------+--------------+--------------+--------------+-------------+--------------+--------------+\n";
+
+    cout << "|" << setw(line_width * 6 - 7) << " |" << setw(line_width - 1) << "Air quality|" << setw(line_width - 2) << desired_parametres.air_quality << "|" << endl;;                          // dodel
+    cout << "+----------------------------------------------------------------------------------------+--------------+--------------+\n";
+    cout << "|" << setw(line_width * 7 + 7) << "|" << endl;
+    cout << "+----------------------------------------------------------------------------------------------------------------------+\n";
+    cout << "|" << setw(line_width * 4 + 2) << "System statuses" << setw(line_width * 4 - 11) << "|" << endl;
+    cout << "+--------------+--------------+--------------+--------------+--------------+-------------+--------------+--------------+\n";
+
+    cout << "|" << setw(line_width - 2) << "Gas" << "|" << setw(line_width - 2) << (mode_of_systems.gas ? "On" : "Off") << "|" << setw(line_width - 1) << " |";
+    cout << setw(line_width - 2) << "Water" << "|" << setw(line_width - 2) << (mode_of_systems.water ? "On" : "Off") << "|" << setw(line_width - 2) << " |"
+        << setw(line_width - 1) << "Electricity|" << setw(line_width - 2) << (mode_of_systems.electricity ? "On" : "Off") << "|" << endl;
+    cout << "+--------------+--------------+--------------+--------------+--------------+-------------+--------------+--------------+\n";
+
+    cout << "|" << setw(line_width - 2) << "Generator" << "|" << setw(line_width - 2) << (mode_of_systems.generator ? "On" : "Off") << "|" << setw(line_width - 1) << " |";
+    cout << setw(line_width - 2) << "Windows" << "|" << setw(line_width - 2) << (mode_of_systems.windows[0] == 1 ? "Open" : "Closed") << "|" << setw(line_width - 2) << " |"
+        << setw(line_width - 1) << "Doors|" << setw(line_width - 2) << (mode_of_systems.doors[0] == 1 ? "Open" : "Closed") << "|" << endl;
+    cout << "+--------------+--------------+--------------+--------------+--------------+-------------+--------------+--------------+\n";
+
+    cout << "|" << setw(line_width - 2) << "Basement WPump" << "|" << setw(line_width - 2) << (mode_of_systems.basement_water_pump ? "On" : "Off") << "|" << setw(line_width - 1) << " |";
+    cout << setw(line_width - 2) << "Drainage syst" << "|" << setw(line_width - 2) << (mode_of_systems.drainage_system ? "On" : "Off") << "|" << setw(line_width - 2) << " |"
+        << setw(line_width - 1) << "Str air in|" << setw(line_width - 2) << (mode_of_systems.street_air_intake ? "On" : "Off") << "|" << endl;
+    cout << "+--------------+--------------+--------------+--------------+--------------+-------------+--------------+--------------+\n";
+
+    cout << "|" << setw(line_width - 2) << "Vent !air_in" << "|" << setw(line_width - 2) << (mode_of_systems.room_ventilation_without_air_intake ? "On" : "Off") << "|" << setw(line_width - 1) << " |";
+    cout << setw(line_width - 2) << "Heating" << "|" << setw(line_width - 2) << (mode_of_systems.heating[0] ? "On" : "Off") << "|" << setw(line_width - 2) << " |"
+        << setw(line_width - 1) << "Room cooling|" << setw(line_width - 2) << (mode_of_systems.room_cooling[0] ? "On" : "Off") << "|" << endl;
+    cout << "+--------------+--------------+--------------+--------------+--------------+-------------+--------------+--------------+\n";
+
+    cout << "|" << setw(line_width - 2) << "Humidity reg" << "|" << setw(line_width - 2) << (mode_of_systems.humidity_regulation[0] ? "On" : "Off") << "|" << setw(line_width * 6 - 7) << " |" << endl;
+    cout << "+----------------------------------------------------------------------------------------------------------------------+\n";
+
+
+    for (;;)
+    {
+        cout << "Для того щоб повернутися на головне меню введiть нуль(0):";
+        int end_num = 1;
+        cin >> end_num;
+        if (end_num == 0)
+        {
+            system("cls");
+            break;
+        }
+    }
+}
+
+void simulate(condition_outside& outside, condition_inside& inside, emergency_alert& alert, operating_mode_of_systems& mode_of_systems, condition_inside& desired_parametres) {
+
+    system("cls");
+
+    cout << "\n--- Симуляція розпочата ---\n";
+
+    int priority_gas = 0;
+    int priority_water = 0;
+    int priority_electricity = 0;
+    int priority_generator = 0;
+
+    int priority_doors = 0;
+    int priority_windows = 0;
+    int priority_basement_water_pump = 0;
+    int priority_drainage_system = 0;
+    int priority_street_air_intake = 0;
+    int priority_room_ventilation_without_air_intake = 0;
+    int priority_heating = 0;
+    int priority_room_cooling = 0;
+    int priority_humidity_regulation = 0;
+
+
+    if (alert.tsunami == 1) {
+        cout << "Тривога - цунамі\n";
+        cout << "Дії системи:\n";
+
+        cout << "- Вимкнення всіх систем\n";
+        mode_of_systems.drainage_system = mode_of_systems.street_air_intake = mode_of_systems.room_ventilation_without_air_intake = 0;
+        mode_of_systems.heating[0] = 0;
+        mode_of_systems.room_cooling[0] = 0;
+        mode_of_systems.humidity_regulation[0] = 0;
+
+        priority_drainage_system = 10;
+        priority_street_air_intake = 10;
+        priority_room_ventilation_without_air_intake = 10;
+        priority_heating = 10;
+        priority_room_cooling = 10;
+        priority_humidity_regulation = 10;
+
+
+
+        if (mode_of_systems.water == 1 || mode_of_systems.electricity == 1 || mode_of_systems.gas == 1) {
+            cout << "- Відключення води/газу/електропостачання\n";
+            mode_of_systems.water = mode_of_systems.electricity = mode_of_systems.gas = 0;
+
+        }
+
+        priority_gas = 10;
+        priority_water = 10;
+        priority_electricity = 10;
+        priority_generator = 10;
+
+
+        if (mode_of_systems.windows[0] == 1) {
+            cout << "- Зачинення вікон\n";
+            mode_of_systems.windows[0] = 0;
+        }
+        priority_windows = 10;
+
+
+        if (mode_of_systems.doors[0] == 1) {
+            cout << "- Зачинення дверей\n";
+            mode_of_systems.doors[0] = 0;
+        }
+        priority_doors = 10;
+
+
+        if (mode_of_systems.generator == 0) {
+            cout << "- Включення генератору\n";
+            mode_of_systems.generator = 1;
+        }
+        priority_generator = 10;
+
+        if (mode_of_systems.basement_water_pump == 0) {
+            cout << "- Включення помпи відкачки води\n";
+            mode_of_systems.basement_water_pump = 1;
+        }
+        priority_basement_water_pump = 10;
+
+        cout << "Система Розумного будинку підготовлена до цунамі\n";
+    }
+
+    if (alert.earthquake == 1) {
+        cout << "Тривога - землетрус\n";
+        cout << "Дії системи:\n";
+
+        cout << "- Вимкнення всіх систем\n";
+
+        int local_priority = 9;
+
+        if (priority_drainage_system <= local_priority) {
+            mode_of_systems.drainage_system = 0;
+            priority_drainage_system = local_priority;
+        }
+
+        if (priority_street_air_intake <= local_priority) {
+            mode_of_systems.street_air_intake = 0;
+            priority_street_air_intake = local_priority;
+        }
+
+        if (priority_room_ventilation_without_air_intake <= local_priority) {
+            mode_of_systems.room_ventilation_without_air_intake = 0;
+            priority_room_ventilation_without_air_intake = local_priority;
+        }
+
+        if (priority_basement_water_pump <= local_priority) {
+            mode_of_systems.basement_water_pump = 0;
+            priority_basement_water_pump = local_priority;
+        }
+
+        if (priority_heating <= local_priority) {
+            mode_of_systems.heating[0] = 0;
+            priority_heating = local_priority;
+        }
+
+        if (priority_room_cooling <= local_priority) {
+            mode_of_systems.room_cooling[0] = 0;
+            priority_room_cooling = local_priority;
+        }
+
+        if (priority_humidity_regulation <= local_priority) {
+            mode_of_systems.humidity_regulation[0] = 0;
+            priority_humidity_regulation = local_priority;
+        }
+
+
+
+        if (priority_water <= local_priority) {
+            if (mode_of_systems.water == 1 || mode_of_systems.electricity == 1 || mode_of_systems.gas == 1) {
+                cout << "- Відключення води/газу/електропостачання\n";
+                mode_of_systems.water = mode_of_systems.electricity = mode_of_systems.gas = 0;
+                priority_gas = local_priority;
+                priority_water = local_priority;
+                priority_electricity = local_priority;
+            }
+        }
+
+        if (mode_of_systems.windows[0] == 0 && (priority_windows <= local_priority)) {
+            cout << "- Відчинення вікон\n";
+            mode_of_systems.windows[0] = 1;
+            priority_windows = local_priority;
+        }
+
+        if (mode_of_systems.doors[0] == 0 && (priority_doors <= local_priority)) {
+            cout << "- Відчинення дверей\n";
+            mode_of_systems.doors[0] = 1;
+            priority_doors = local_priority;
+        }
+
+        if (mode_of_systems.generator == 0 && (priority_generator <= local_priority)) {
+            cout << "- Включення генератору\n";
+            mode_of_systems.generator = 1;
+            priority_generator = local_priority;
+        }
+
+        cout << "Система Розумного будинку підготовлена до землетрусу\n";
+    }
+
+    if (alert.forest_fire == 1) {
+
+        int local_priority = 6;
+
+        cout << "Тривога - лісова пожежа\n";
+        cout << "Дії системи:\n";
+
+        if (mode_of_systems.windows[0] == 1 && (priority_windows <= local_priority)) {
+            cout << "- Зачинення вікон\n";
+            mode_of_systems.windows[0] = 0;
+            priority_windows = local_priority;
+        }
+
+        if (mode_of_systems.doors[0] == 1 && (priority_doors <= local_priority)) {
+            cout << "- Зачинення дверей\n";
+            mode_of_systems.doors[0] = 0;
+            priority_doors = local_priority;
+        }
+
+        if (mode_of_systems.street_air_intake == 1 && (priority_street_air_intake <= local_priority)) {
+            cout << "- Відключення системи забору повітря ззовні\n";
+            mode_of_systems.street_air_intake = 0;
+            priority_street_air_intake = local_priority;
+        }
+
+        if (mode_of_systems.room_ventilation_without_air_intake == 0 && (priority_room_ventilation_without_air_intake <= local_priority)) {
+            cout << "- Включення системи вентиляції без забору повітря ззовні\n";
+            mode_of_systems.room_ventilation_without_air_intake = 1;
+            priority_room_ventilation_without_air_intake = local_priority;
+        }
+
+        cout << "Система Розумного будинку підготовлена до тривоги - лісова пожежа\n";
+    }
+
+    if (alert.storm == 1) {
+
+        int local_priority = 7;
+
+        cout << "Тривога - шторм\n";
+        cout << "Дії системи:\n";
+
+
+        if (mode_of_systems.electricity == 1 && (priority_electricity <= local_priority)) {
+            cout << "- Відключення електропостачання\n";
+            mode_of_systems.water = mode_of_systems.electricity = mode_of_systems.gas = 0;
+            priority_electricity = local_priority;
+        }
+
+        if (mode_of_systems.windows[0] == 0 && (priority_windows <= local_priority)) {
+            cout << "- Відчинення вікон\n";
+            mode_of_systems.windows[0] = 1;
+            priority_windows = local_priority;
+        }
+
+        if (mode_of_systems.doors[0] == 0 && (priority_doors <= local_priority)) {
+            cout << "- Відчинення дверей\n";
+            mode_of_systems.doors[0] = 1;
+            priority_doors = local_priority;
+        }
+
+        if (mode_of_systems.generator == 0 && (priority_generator <= local_priority)) {
+            cout << "- Включення генератору\n";
+            mode_of_systems.generator = 1;
+            priority_generator = local_priority;
+        }
+
+        if (mode_of_systems.basement_water_pump == 0 && (priority_basement_water_pump <= local_priority)) {
+            cout << "- Включення помпи відкачки води\n";
+            mode_of_systems.basement_water_pump = 1;
+            priority_basement_water_pump = local_priority;
+        }
+
+        if (mode_of_systems.drainage_system == 0 && (priority_drainage_system <= local_priority)) {
+            cout << "- Включення дренажної системи\n";
+            mode_of_systems.drainage_system = 1;
+            priority_drainage_system = local_priority;
+        }
+
+        cout << "Система Розумного будинку підготовлена до шторму\n";
+    }
+
+    if (outside.precipitation > 0) {
+
+        int local_priority = 7;
+
+        if (outside.precipitation > 0 && outside.precipitation <= 0.25) {
+            cout << "Дуже слабкий дощ\n";
+        }
+
+        if (outside.precipitation > 0.25 && outside.precipitation <= 2.5) {
+            cout << "Слабкий дощ\n";
+        }
+
+        if (outside.precipitation > 2.5 && outside.precipitation <= 7.6) {
+            cout << "Помірний дощ\n";
+
+            if ((mode_of_systems.windows[0] == 1 || mode_of_systems.doors[0] == 1) && (priority_doors <= local_priority || priority_windows <= local_priority)) {
+                cout << "- Зачинення дверей/вікон\n";
+                mode_of_systems.doors[0] = 0;
+                mode_of_systems.windows[0] = 0;
+                priority_windows = local_priority;
+                priority_doors = local_priority;
+            }
+
+            if (mode_of_systems.drainage_system == 0 && (priority_drainage_system <= local_priority)) {
+                cout << "- Включення дренажної системи\n";
+                mode_of_systems.drainage_system = 1;
+                priority_drainage_system = local_priority;
+            }
+        }
+
+        if (outside.precipitation > 7.6 && outside.precipitation <= 50) {
+            cout << "Сильний дощ\n";
+            if ((mode_of_systems.windows[0] == 1 || mode_of_systems.doors[0] == 1) && (priority_doors <= local_priority || priority_windows <= local_priority)) {
+                cout << "- Зачинення дверей/вікон\n";
+                mode_of_systems.doors[0] = 0;
+                mode_of_systems.windows[0] = 0;
+                priority_windows = priority_doors = local_priority;
+            }
+
+            if (mode_of_systems.drainage_system == 0 && (priority_drainage_system <= local_priority)) {
+                cout << "- Включення дренажної системи\n";
+                mode_of_systems.drainage_system = 1;
+                priority_drainage_system = local_priority;
+            }
+        }
+
+        if (outside.precipitation > 50) {
+            cout << "Злива\n";
+            if ((mode_of_systems.windows[0] == 1 || mode_of_systems.doors[0] == 1) && (priority_doors <= local_priority || priority_windows <= local_priority)) {
+                cout << "- Зачинення дверей/вікон\n";
+                mode_of_systems.doors[0] = 0;
+                mode_of_systems.windows[0] = 0;
+                priority_windows = priority_doors = local_priority;
+            }
+
+            if (mode_of_systems.drainage_system == 0 && (priority_drainage_system <= local_priority)) {
+                cout << "- Включення дренажної системи\n";
+                mode_of_systems.drainage_system = 1;
+                priority_drainage_system = local_priority;
+            }
+
+            if (mode_of_systems.basement_water_pump == 0 && (priority_basement_water_pump <= local_priority)) {
+                cout << "- Включення помпи відкачки води\n";
+                mode_of_systems.basement_water_pump = 1;
+                priority_basement_water_pump = local_priority;
+            }
+            cout << "Система Розумного будинку підготовлена до опадів\n";
+        }
+
+
+    }
+
+    if (outside.wind > 0) {
+
+        int local_priority = 6;
+
+        if (outside.wind <= 0.3) {
+            cout << "Вітер - штиль\n";
+        }
+
+        if (outside.wind > 0.3 && outside.wind <= 1.5) {
+            cout << "Вітер - тихий\n";
+        }
+
+        if (outside.wind > 1.5 && outside.wind <= 3.4) {
+            cout << "Вітер - легкий\n";
+        }
+
+        if (outside.wind > 3.4 && outside.wind <= 5.4) {
+            cout << "Вітер - слабкий\n";
+        }
+
+        if (outside.wind > 5.4) {
+            if ((mode_of_systems.windows[0] == 1 || mode_of_systems.doors[0] == 1) && (priority_doors <= local_priority || priority_windows <= local_priority)) {
+                cout << "- Зачинення дверей/вікон\n";
+                mode_of_systems.doors[0] = 0;
+                mode_of_systems.windows[0] = 0;
+                priority_windows = priority_doors = local_priority;
+            }
+
+            if (outside.wind > 5.4 && outside.wind <= 7.9) {
+                cout << "Вітер - помірний\n";
+            }
+
+            if (outside.wind > 7.9 && outside.wind <= 10.7) {
+                cout << "Вітер - свіжий\n";
+            }
+
+            if (outside.wind > 10.7 && outside.wind <= 17.8) {
+                cout << "Вітер - сильний\n";
+            }
+
+            if (outside.wind > 17.8) {
+                cout << "Вітер - дуже сильний\n";
+            }
+        }
+
+    }
+
+
+    // air_quality
+    { // air_quality
+        int local_priority = 4;
+
+        if (desired_parametres.air_quality > outside.air_quality && alert.tsunami == 0 && alert.forest_fire == 0 && alert.earthquake == 0 && alert.storm == 0) {
+
+            if (inside.air_quality == desired_parametres.air_quality) {
+                // nothing, all is ok
+            }
+            else if (desired_parametres.air_quality < inside.air_quality) {
+
+
+                if ((abs(outside.temperature - desired_parametres.temperature) <= 8) && (abs(outside.humidity - desired_parametres.humidity) <= 21))
+                {
+                    if (mode_of_systems.windows[0] == 0 && (priority_windows <= local_priority)) {
+                        cout << "- Відчинення вікон\n";
+                        mode_of_systems.windows[0] = 1;
+                        priority_windows = local_priority;
+                    }
+
+                    if (mode_of_systems.doors[0] == 0 && (priority_doors <= local_priority)) {
+                        cout << "- Відчинення дверей\n";
+                        mode_of_systems.doors[0] = 1;
+                        priority_doors = local_priority;
+                    }
+
+                    if (mode_of_systems.street_air_intake == 0 && (priority_street_air_intake <= local_priority)) {
+                        cout << "- Включення системи забору повітря ззовні\n";
+                        mode_of_systems.street_air_intake = 1;
+                        priority_street_air_intake = local_priority;
+                    }
+
+                    if (mode_of_systems.room_ventilation_without_air_intake == 1 && (priority_room_ventilation_without_air_intake <= local_priority)) {
+                        cout << "- Відключення системи вентиляції без забору повітря ззовні\n";
+                        mode_of_systems.room_ventilation_without_air_intake = 0;
+                        priority_room_ventilation_without_air_intake = local_priority;
+                    }
+                    cout << "- Зниження індексу якості повітря з " << inside.air_quality << " до " << desired_parametres.air_quality << " \n";
+                    inside.air_quality = desired_parametres.air_quality;
+                }
+                else
+                {
+
+                    if (mode_of_systems.windows[0] == 1 && (priority_windows <= local_priority)) {
+                        cout << "- Зачинення вікон\n";
+                        mode_of_systems.windows[0] = 0;
+                        priority_windows = local_priority;
+                    }
+
+                    if (mode_of_systems.doors[0] == 1 && (priority_doors <= local_priority)) {
+                        cout << "- Зачинення дверей\n";
+                        mode_of_systems.doors[0] = 0;
+                        priority_doors = local_priority;
+                    }
+
+                    if (mode_of_systems.street_air_intake == 1 && (priority_street_air_intake <= local_priority)) {
+                        cout << "- Відключення системи забору повітря ззовні\n";
+                        mode_of_systems.street_air_intake = 0;
+                        priority_street_air_intake = local_priority;
+                    }
+
+                    if (mode_of_systems.room_ventilation_without_air_intake == 0 && (priority_room_ventilation_without_air_intake <= local_priority)) {
+                        cout << "- Включення системи вентиляції без забору повітря ззовні\n";
+                        mode_of_systems.room_ventilation_without_air_intake = 1;
+                        priority_room_ventilation_without_air_intake = local_priority;
+                    }
+
+                    
+                    cout << "- Підвищення індексу якості повітря з " << inside.air_quality << " до " << desired_parametres.air_quality << " \n";
+                    inside.air_quality = desired_parametres.air_quality;
+                }
+
+                //}
+
+
+
+
+                   ///
+
+            }
+
+        }
+        else if (desired_parametres.air_quality < outside.air_quality && alert.tsunami == 0 && alert.forest_fire == 0 && alert.earthquake == 0 && alert.storm == 0) {
+
+            if (inside.air_quality == desired_parametres.air_quality) {
+                // nothing, all is ok
+            }
+            else if (desired_parametres.air_quality < inside.air_quality && alert.tsunami == 0 && alert.forest_fire == 0 && alert.earthquake == 0 && alert.storm == 0) {
+
+
+                if ((abs(outside.temperature - desired_parametres.temperature) <= 8) && (abs(outside.humidity - desired_parametres.humidity) <= 21))
+                {
+                    if (mode_of_systems.windows[0] == 1 && (priority_windows <= local_priority)) {
+                        cout << "- Зачинення вікон\n";
+                        mode_of_systems.windows[0] = 0;
+                        priority_windows = local_priority;
+                    }
+
+                    if (mode_of_systems.doors[0] == 1 && (priority_doors <= local_priority)) {
+                        cout << "- Зачинення дверей\n";
+                        mode_of_systems.doors[0] = 0;
+                        priority_doors = local_priority;
+                    }
+
+                    if (mode_of_systems.street_air_intake == 1 && (priority_street_air_intake <= local_priority)) {
+                        cout << "- Відключення системи забору повітря ззовні\n";
+                        mode_of_systems.street_air_intake = 0;
+                        priority_street_air_intake = local_priority;
+                    }
+
+                    if (mode_of_systems.room_ventilation_without_air_intake == 0 && (priority_room_ventilation_without_air_intake <= local_priority)) {
+                        cout << "- Включення системи вентиляції без забору повітря ззовні\n";
+                        mode_of_systems.room_ventilation_without_air_intake = 1;
+                        priority_room_ventilation_without_air_intake = local_priority;
+                    }
+                    cout << "- Зниження індексу якості повітря з " << inside.air_quality << " до " << desired_parametres.air_quality << " \n";
+                    inside.air_quality = desired_parametres.air_quality;
+                }
+                else
+                {
+
+                    if (mode_of_systems.windows[0] == 0 && (priority_windows <= local_priority)) {
+                        cout << "- Відчинення вікон\n";
+                        mode_of_systems.windows[0] = 1;
+                        priority_windows = local_priority;
+                    }
+
+                    if (mode_of_systems.doors[0] == 0 && (priority_doors <= local_priority)) {
+                        cout << "- Відчинення дверей\n";
+                        mode_of_systems.doors[0] = 1;
+                        priority_doors = local_priority;
+                    }
+
+                    if (mode_of_systems.street_air_intake == 0 && (priority_street_air_intake <= local_priority)) {
+                        cout << "- Включення системи забору повітря ззовні\n";
+                        mode_of_systems.street_air_intake = 1;
+                        priority_street_air_intake = local_priority;
+                    }
+
+                    if (mode_of_systems.room_ventilation_without_air_intake == 1 && (priority_room_ventilation_without_air_intake <= local_priority)) {
+                        cout << "- Відключення системи вентиляції без забору повітря ззовні\n";
+                        mode_of_systems.room_ventilation_without_air_intake = 0;
+                        priority_room_ventilation_without_air_intake = local_priority;
+                    }
+                    cout << "- Підвищення індексу якості повітря з " << inside.air_quality << " до " << desired_parametres.air_quality << " \n";
+                    inside.air_quality = desired_parametres.air_quality;
+                }
+
+            }
+        }
+
+        if (outside.air_quality > inside.air_quality && alert.tsunami == 0 && alert.forest_fire == 0 && alert.earthquake == 0 && alert.storm == 0) {
+
+            if (mode_of_systems.windows[0] == 1 && (priority_windows <= local_priority)) {
+                cout << "- Зачинення вікон\n";
+                mode_of_systems.windows[0] = 0;
+                priority_windows = local_priority;
+            }
+
+            if (mode_of_systems.doors[0] == 1 && (priority_doors <= local_priority)) {
+                cout << "- Зачинення дверей\n";
+                mode_of_systems.doors[0] = 0;
+                priority_doors = local_priority;
+
+            }
+        }
+
+
+    }
+
+    
+
+
+
+    // humidity
+    {
+        // humidity
+
+        //,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+        int local_priority = 4;
+
+        if (desired_parametres.humidity < outside.humidity && alert.tsunami == 0 && alert.forest_fire == 0 && alert.earthquake == 0 && alert.storm == 0) {
+
+            if (inside.humidity == desired_parametres.humidity) {
+                // nothing, all is ok
+            }
+            else if (desired_parametres.humidity > inside.humidity && alert.tsunami == 0 && alert.forest_fire == 0 && alert.earthquake == 0 && alert.storm == 0) {
+
+
+                if ((abs(outside.temperature - desired_parametres.temperature) <= 8) && (abs(desired_parametres.air_quality - outside.air_quality) <= 21))
+                {
+                    if (mode_of_systems.windows[0] == 0 && (priority_windows <= local_priority)) {
+                        cout << "- Відчинення вікон\n";
+                        mode_of_systems.windows[0] = 1;
+                        priority_windows = local_priority;
+                    }
+
+                    if (mode_of_systems.doors[0] == 0 && (priority_doors <= local_priority)) {
+                        cout << "- Відчинення дверей\n";
+                        mode_of_systems.doors[0] = 1;
+                        priority_doors = local_priority;
+                    }
+
+                    if (mode_of_systems.street_air_intake == 0 && (priority_street_air_intake <= local_priority)) {
+                        cout << "- Включення системи забору повітря ззовні\n";
+                        mode_of_systems.street_air_intake = 1;
+                        priority_street_air_intake = local_priority;
+                    }
+
+                    if (mode_of_systems.humidity_regulation[0] == 1 && (priority_humidity_regulation <= local_priority)) {
+                        cout << "- Відключення системи регуляції вологості\n";
+                        mode_of_systems.humidity_regulation[0] = 0;
+                        priority_humidity_regulation = local_priority;
+                    }
+
+                    if (mode_of_systems.room_ventilation_without_air_intake == 1 && (priority_room_ventilation_without_air_intake <= local_priority)) {
+                        cout << "- Відключення системи вентиляції без забору повітря ззовні\n";
+                        mode_of_systems.room_ventilation_without_air_intake = 0;
+                        priority_room_ventilation_without_air_intake = local_priority;
+                    }
+                    cout << "- Підвищення вологості з " << inside.humidity << " до " << desired_parametres.humidity << " \n";
+                    inside.humidity = desired_parametres.humidity;
+                }
+                else
+                {
+
+                    if (mode_of_systems.windows[0] == 1 && (priority_windows <= local_priority)) {
+                        cout << "- Зачинення вікон\n";
+                        mode_of_systems.windows[0] = 0;
+                        priority_windows = local_priority;
+                    }
+
+                    if (mode_of_systems.doors[0] == 1 && (priority_doors <= local_priority)) {
+                        cout << "- Зачинення дверей\n";
+                        mode_of_systems.doors[0] = 0;
+                        priority_doors = local_priority;
+                    }
+
+                    if (mode_of_systems.street_air_intake == 1 && (priority_street_air_intake <= local_priority)) {
+                        cout << "- Відключення системи забору повітря ззовні\n";
+                        mode_of_systems.street_air_intake = 0;
+                        priority_street_air_intake = local_priority;
+                    }
+
+                    if (mode_of_systems.humidity_regulation[0] == 0 && (priority_humidity_regulation <= local_priority)) {
+                        cout << "- Включення системи регуляції вологості\n";
+                        mode_of_systems.humidity_regulation[0] = 1;
+                        priority_humidity_regulation = local_priority;
+                    }
+
+                    if (mode_of_systems.room_ventilation_without_air_intake == 0 && (priority_room_ventilation_without_air_intake <= local_priority)) {
+                        cout << "- Включення системи вентиляції без забору повітря ззовні\n";
+                        mode_of_systems.room_ventilation_without_air_intake = 1;
+                        priority_room_ventilation_without_air_intake = local_priority;
+                    }
+                    cout << "- Зниження вологості з " << inside.humidity << " до " << desired_parametres.humidity << " \n";
+                    inside.humidity = desired_parametres.humidity;
+                }
+
+                //}
+
+
+
+
+                   ///
+
+            }
+
+        }
+        else if (desired_parametres.humidity > outside.humidity && alert.tsunami == 0 && alert.forest_fire == 0 && alert.earthquake == 0 && alert.storm == 0) {
+
+            if (inside.humidity == desired_parametres.humidity) {
+                // nothing, all is ok
+            }
+            else if (desired_parametres.humidity > inside.humidity) {
+
+
+                if ((abs(outside.temperature - desired_parametres.temperature) <= 8) && (abs(desired_parametres.air_quality - outside.air_quality) <= 21))
+                {
+                    if (mode_of_systems.windows[0] == 1 && (priority_windows <= local_priority)) {
+                        cout << "- Зачинення вікон\n";
+                        mode_of_systems.windows[0] = 0;
+                        priority_windows = local_priority;
+                    }
+
+                    if (mode_of_systems.doors[0] == 1 && (priority_doors <= local_priority)) {
+                        cout << "- Зачинення дверей\n";
+                        mode_of_systems.doors[0] = 0;
+                        priority_doors = local_priority;
+                    }
+
+                    if (mode_of_systems.street_air_intake == 1 && (priority_street_air_intake <= local_priority)) {
+                        cout << "- Відключення системи забору повітря ззовні\n";
+                        mode_of_systems.street_air_intake = 0;
+                        priority_street_air_intake = local_priority;
+                    }
+
+                    if (mode_of_systems.humidity_regulation[0] == 0 && (priority_humidity_regulation <= local_priority)) {
+                        cout << "- Включення системи регуляції вологості\n";
+                        mode_of_systems.humidity_regulation[0] = 1;
+                        priority_humidity_regulation = local_priority;
+                    }
+
+                    if (mode_of_systems.room_ventilation_without_air_intake == 0 && (priority_room_ventilation_without_air_intake <= local_priority)) {
+                        cout << "- Включення системи вентиляції без забору повітря ззовні\n";
+                        mode_of_systems.room_ventilation_without_air_intake = 1;
+                        priority_room_ventilation_without_air_intake = local_priority;
+                    }
+                    cout << "- Підвищення вологості з " << inside.humidity << " до " << desired_parametres.humidity << " \n";
+                    inside.humidity = desired_parametres.humidity;
+                }
+                else
+                {
+
+                    if (mode_of_systems.windows[0] == 0 && (priority_windows <= local_priority)) {
+                        cout << "- Відчинення вікон\n";
+                        mode_of_systems.windows[0] = 1;
+                        priority_windows = local_priority;
+                    }
+
+                    if (mode_of_systems.doors[0] == 0 && (priority_doors <= local_priority)) {
+                        cout << "- Відчинення дверей\n";
+                        mode_of_systems.doors[0] = 1;
+                        priority_doors = local_priority;
+                    }
+
+                    if (mode_of_systems.street_air_intake == 0 && (priority_street_air_intake <= local_priority)) {
+                        cout << "- Включення системи забору повітря ззовні\n";
+                        mode_of_systems.street_air_intake = 1;
+                        priority_street_air_intake = local_priority;
+                    }
+
+                    if (mode_of_systems.humidity_regulation[0] == 1 && (priority_humidity_regulation <= local_priority)) {
+                        cout << "- Відключення системи регуляції вологості\n";
+                        mode_of_systems.humidity_regulation[0] = 0;
+                        priority_humidity_regulation = local_priority;
+                    }
+
+                    if (mode_of_systems.room_ventilation_without_air_intake == 1 && (priority_room_ventilation_without_air_intake <= local_priority)) {
+                        cout << "- Відключення системи вентиляції без забору повітря ззовні\n";
+                        mode_of_systems.room_ventilation_without_air_intake = 0;
+                        priority_room_ventilation_without_air_intake = local_priority;
+                    }
+                    cout << "- Підвищення вологості з " << inside.humidity << " до " << desired_parametres.humidity << " \n";
+                    inside.humidity = desired_parametres.humidity;
+                }
+
+            }
+        }
+
+        if (desired_parametres.humidity > inside.humidity && alert.tsunami == 0 && alert.forest_fire == 0 && alert.earthquake == 0 && alert.storm == 0) {
+
+            if (mode_of_systems.windows[0] == 1 && (priority_windows <= local_priority)) {
+                cout << "- Зачинення вікон\n";
+                mode_of_systems.windows[0] = 0;
+                priority_windows = local_priority;
+            }
+
+            if (mode_of_systems.doors[0] == 1 && (priority_doors <= local_priority)) {
+                cout << "- Зачинення дверей\n";
+                mode_of_systems.doors[0] = 0;
+                priority_doors = local_priority;
+
+            }
+
+            if (mode_of_systems.street_air_intake == 1 && (priority_street_air_intake <= local_priority)) {
+                cout << "- Відключення системи забору повітря ззовні\n";
+                mode_of_systems.street_air_intake = 0;
+                priority_street_air_intake = local_priority;
+            }
+
+            if (mode_of_systems.humidity_regulation[0] == 0 && (priority_humidity_regulation <= local_priority)) {
+                cout << "- Включення системи регуляції вологості\n";
+                mode_of_systems.humidity_regulation[0] = 1;
+                priority_humidity_regulation = local_priority;
+            }
+
+            if (mode_of_systems.room_ventilation_without_air_intake == 0 && (priority_room_ventilation_without_air_intake <= local_priority)) {
+                cout << "- Включення системи вентиляції без забору повітря ззовні\n";
+                mode_of_systems.room_ventilation_without_air_intake = 1;
+                priority_room_ventilation_without_air_intake = local_priority;
+            }
+
+            cout << "- Підвищення вологості з " << inside.humidity << " до " << desired_parametres.humidity << " \n";
+            inside.humidity = desired_parametres.humidity;
+
+        }
+
+        if (outside.humidity > inside.humidity || outside.humidity < inside.humidity && alert.tsunami == 0 && alert.forest_fire == 0 && alert.earthquake == 0 && alert.storm == 0) {
+
+            if (mode_of_systems.windows[0] == 1 && (priority_windows <= local_priority)) {
+                cout << "- Зачинення вікон\n";
+                mode_of_systems.windows[0] = 0;
+                priority_windows = local_priority;
+            }
+
+            if (mode_of_systems.doors[0] == 1 && (priority_doors <= local_priority)) {
+                cout << "- Зачинення дверей\n";
+                mode_of_systems.doors[0] = 0;
+                priority_doors = local_priority;
+
+            }
+
+
+
+        }
+
+    }
+
+
+
+    // temperature доделать
+    { // temperature
+
+    //,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+        int local_priority = 5;
+
+        if (desired_parametres.temperature < outside.temperature && alert.tsunami == 0 && alert.forest_fire == 0 && alert.earthquake == 0 && alert.storm == 0) {
+
+            if (inside.temperature == desired_parametres.temperature) {
+                // nothing, all is ok
+            }
+            else if (desired_parametres.temperature > inside.temperature) {
+
+
+                if ((abs(outside.humidity - desired_parametres.humidity) <= 8) && (abs(desired_parametres.air_quality - outside.air_quality) <= 21))
+                {
+                    if (mode_of_systems.windows[0] == 0 && (priority_windows <= local_priority)) {
+                        cout << "- Відчинення вікон\n";
+                        mode_of_systems.windows[0] = 1;
+                        priority_windows = local_priority;
+                    }
+
+                    if (mode_of_systems.doors[0] == 0 && (priority_doors <= local_priority)) {
+                        cout << "- Відчинення дверей\n";
+                        mode_of_systems.doors[0] = 1;
+                        priority_doors = local_priority;
+                    }
+
+                    if (mode_of_systems.street_air_intake == 0 && (priority_street_air_intake <= local_priority)) {
+                        cout << "- Включення системи забору повітря ззовні\n";
+                        mode_of_systems.street_air_intake = 1;
+                        priority_street_air_intake = local_priority;
+                    }
+
+                    if (mode_of_systems.room_cooling[0] == 1 && (priority_room_cooling <= local_priority)) {
+                        cout << "- Відключення системи охолодження\n";
+                        mode_of_systems.room_cooling[0] = 0;
+                        priority_room_cooling = local_priority;
+                    }
+                    cout << "- Підвищення температури з " << inside.temperature << " до " << desired_parametres.temperature << " \n";
+                    inside.temperature = desired_parametres.temperature;
+                }
+                else
+                {
+
+                    if (mode_of_systems.windows[0] == 1 && (priority_windows <= local_priority)) {
+                        cout << "- Зачинення вікон\n";
+                        mode_of_systems.windows[0] = 0;
+                        priority_windows = local_priority;
+                    }
+
+                    if (mode_of_systems.doors[0] == 1 && (priority_doors <= local_priority)) {
+                        cout << "- Зачинення дверей\n";
+                        mode_of_systems.doors[0] = 0;
+                        priority_doors = local_priority;
+                    }
+
+                    if (mode_of_systems.street_air_intake == 1 && (priority_street_air_intake <= local_priority)) {
+                        cout << "- Відключення системи забору повітря ззовні\n";
+                        mode_of_systems.street_air_intake = 0;
+                        priority_street_air_intake = local_priority;
+                    }
+
+                    if (mode_of_systems.room_cooling[0] == 0 && (priority_room_cooling <= local_priority)) {
+                        cout << "- Включення системи охолодження\n";
+                        mode_of_systems.room_cooling[0] = 1;
+                        priority_room_cooling = local_priority;
+                    }
+
+                    if (mode_of_systems.room_ventilation_without_air_intake == 0 && (priority_room_ventilation_without_air_intake <= local_priority)) {
+                        cout << "- Включення системи вентиляції без забору повітря ззовні\n";
+                        mode_of_systems.room_ventilation_without_air_intake = 1;
+                        priority_room_ventilation_without_air_intake = local_priority;
+                    }
+                    cout << "- Зниження температури з " << inside.temperature << " до " << desired_parametres.temperature << " \n";
+                    inside.temperature = desired_parametres.temperature;
+                }
+
+                //}
+
+
+
+
+                   ///
+
+            }
+
+        }
+        else if (desired_parametres.temperature > outside.temperature && alert.tsunami == 0 && alert.forest_fire == 0 && alert.earthquake == 0 && alert.storm == 0) {
+
+            if (inside.temperature == desired_parametres.temperature) {
+                // nothing, all is ok
+            }
+            else if (desired_parametres.temperature < inside.temperature) {
+
+
+                if ((abs(outside.humidity - desired_parametres.humidity) <= 8) && (abs(desired_parametres.air_quality - outside.air_quality) <= 21))
+                {
+                    if (mode_of_systems.windows[0] == 1 && (priority_windows <= local_priority)) {
+                        cout << "- Зачинення вікон\n";
+                        mode_of_systems.windows[0] = 0;
+                        priority_windows = local_priority;
+                    }
+
+                    if (mode_of_systems.doors[0] == 1 && (priority_doors <= local_priority)) {
+                        cout << "- Зачинення дверей\n";
+                        mode_of_systems.doors[0] = 0;
+                        priority_doors = local_priority;
+                    }
+
+                    if (mode_of_systems.street_air_intake == 1 && (priority_street_air_intake <= local_priority)) {
+                        cout << "- Відключення системи забору повітря ззовні\n";
+                        mode_of_systems.street_air_intake = 0;
+                        priority_street_air_intake = local_priority;
+                    }
+
+                    if (mode_of_systems.heating[0] == 0 && (priority_heating <= local_priority)) {
+                        cout << "- Включення системи обігріву\n";
+                        mode_of_systems.heating[0] = 1;
+                        priority_heating = local_priority;
+                    }
+
+                    if (mode_of_systems.room_ventilation_without_air_intake == 0 && (priority_room_ventilation_without_air_intake <= local_priority)) {
+                        cout << "- Включення системи вентиляції без забору повітря ззовні\n";
+                        mode_of_systems.room_ventilation_without_air_intake = 1;
+                        priority_room_ventilation_without_air_intake = local_priority;
+                    }
+                    cout << "- Підвищення температури з " << inside.temperature << " до " << desired_parametres.temperature << " \n";
+                    inside.temperature = desired_parametres.temperature;
+                }
+                else
+                {
+
+                    if (mode_of_systems.windows[0] == 0 && (priority_windows <= local_priority)) {
+                        cout << "- Відчинення вікон\n";
+                        mode_of_systems.windows[0] = 1;
+                        priority_windows = local_priority;
+                    }
+
+                    if (mode_of_systems.doors[0] == 0 && (priority_doors <= local_priority)) {
+                        cout << "- Відчинення дверей\n";
+                        mode_of_systems.doors[0] = 1;
+                        priority_doors = local_priority;
+                    }
+
+                    if (mode_of_systems.street_air_intake == 0 && (priority_street_air_intake <= local_priority)) {
+                        cout << "- Включення системи забору повітря ззовні\n";
+                        mode_of_systems.street_air_intake = 1;
+                        priority_street_air_intake = local_priority;
+                    }
+
+                    if (mode_of_systems.room_ventilation_without_air_intake == 1 && (priority_room_ventilation_without_air_intake <= local_priority)) {
+                        cout << "- Відключення системи вентиляції без забору повітря ззовні\n";
+                        mode_of_systems.room_ventilation_without_air_intake = 0;
+                        priority_room_ventilation_without_air_intake = local_priority;
+                    }
+
+                    if (mode_of_systems.heating[0] == 1 && (priority_heating <= local_priority)) {
+                        cout << "- Відключення системи обігріву\n";
+                        mode_of_systems.heating[0] = 0;
+                        priority_heating = local_priority;
+                    }
+
+                    if (mode_of_systems.room_cooling[0] == 1 && (priority_room_cooling <= local_priority)) {
+                        cout << "- Відключення системи охолодження\n";
+                        mode_of_systems.room_cooling[0] = 0;
+                        priority_room_cooling = local_priority;
+                    }
+
+                    cout << "- Зниження температури " << inside.temperature << " до " << desired_parametres.temperature << " \n";
+                    inside.temperature = desired_parametres.temperature;
+                }
+
+            }
+        }
+
+        if (desired_parametres.temperature > inside.temperature && alert.tsunami == 0 && alert.forest_fire == 0 && alert.earthquake == 0 && alert.storm == 0) {
+
+            if (mode_of_systems.windows[0] == 1 && (priority_windows <= local_priority)) {
+                cout << "- Зачинення вікон\n";
+                mode_of_systems.windows[0] = 0;
+                priority_windows = local_priority;
+            }
+
+            if (mode_of_systems.doors[0] == 1 && (priority_doors <= local_priority)) {
+                cout << "- Зачинення дверей\n";
+                mode_of_systems.doors[0] = 0;
+                priority_doors = local_priority;
+
+            }
+
+            if (mode_of_systems.street_air_intake == 1 && (priority_street_air_intake <= local_priority)) {
+                cout << "- Відключення системи забору повітря ззовні\n";
+                mode_of_systems.street_air_intake = 0;
+                priority_street_air_intake = local_priority;
+            }
+
+            if (mode_of_systems.heating[0] == 0 && (priority_heating <= local_priority)) {
+                cout << "- Включення системи обігріву\n";
+                mode_of_systems.heating[0] = 1;
+                priority_heating = local_priority;
+            }
+
+            if (mode_of_systems.room_ventilation_without_air_intake == 0 && (priority_room_ventilation_without_air_intake <= local_priority)) {
+                cout << "- Включення системи вентиляції без забору повітря ззовні\n";
+                mode_of_systems.room_ventilation_without_air_intake = 1;
+                priority_room_ventilation_without_air_intake = local_priority;
+            }
+
+            cout << "- Підвищення температури з " << inside.temperature << " до " << desired_parametres.temperature << " \n";
+            inside.temperature = desired_parametres.temperature;
+
+        }
+
+        if (outside.temperature > inside.temperature || outside.temperature < inside.temperature && alert.tsunami == 0 && alert.forest_fire == 0 && alert.earthquake == 0 && alert.storm == 0) {
+
+            if (mode_of_systems.windows[0] == 1 && (priority_windows <= local_priority)) {
+                cout << "- Зачинення вікон\n";
+                mode_of_systems.windows[0] = 0;
+                priority_windows = local_priority;
+            }
+
+            if (mode_of_systems.doors[0] == 1 && (priority_doors <= local_priority)) {
+                cout << "- Зачинення дверей\n";
+                mode_of_systems.doors[0] = 0;
+                priority_doors = local_priority;
+
+            }
+
+
+
+        }
+
+    }
+
+
+
+    //,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+
+        // Розрахунок точки роси
+    {
+        double Ps_T; // Переменная для хранения давления насыщенного пара
+
+        // Константы для формулы Магнуса-Тетена (для воды, T >= 0°C)
+        double A1_MAGNUS = 17.625;
+        double B1_MAGNUS = 243.04;
+        double E_S0_WATER_PA = 610.94; // Давление насыщения при 0°C в Паскалях
+
+        // Вычисляем Ps_T
+        Ps_T = E_S0_WATER_PA * exp((A1_MAGNUS * inside.temperature) / (inside.temperature + B1_MAGNUS));
+
+
+        double Pv;
+
+        Pv = Ps_T * (inside.humidity / 100.0);
+
+
+        double Td;
+
+        if (Pv <= 0.0) {
+            Td = -999.0; // Очень низкое значение, указывающее на крайне сухой воздух или ошибку
+        }
+        else {
+            double log_Pv_div_Es0 = log(Pv / E_S0_WATER_PA);
+            Td = (B1_MAGNUS * log_Pv_div_Es0) / (A1_MAGNUS - log_Pv_div_Es0);
+        }
+
+
+        bool is_dew_likely = false;
+
+        if (Td > -990.0) {
+            if (Td >= inside.temperature) {
+
+
+                is_dew_likely = true;
+            }
+            else {
+                is_dew_likely = false;
+            }
+        }
+        else {
+            is_dew_likely = false;
+        }
+
+
+        if (is_dew_likely) {
+            cout << "Вірогідніть точки роси, тому температуру в приміщенні необхідно підняти на 1 град.ц.";
+            inside.temperature += 0.5;
+        }
+
+        // Кінець розрахунок точки роси
+    }
+
+    cout << "\n--- Симуляція завершена ---\n";
+    cout << "- Інформаційне зведення після завершення симуляції:\n";
+    print_table(outside, inside, alert, mode_of_systems, desired_parametres);
+
+}
+
+
+void changes(condition_outside& outside, condition_inside& inside, emergency_alert& alert, operating_mode_of_systems& mode_of_systems, condition_inside& desired_parametres) {
+    int choice;
+    bool changes_made = false;
+
+    for (;;) {
+        system("cls");
+        cout << "=== Меню внесення змін ===\n";
+        cout << "1 - Змінити умови ЗОВНІШНЬОГО середовища\n";
+        cout << "2 - Змінити умови ВСЕРЕДИНІ приміщення\n";
+        cout << "3 - Змінити стан надзвичайних ситуацій\n";
+        cout << "4 - Змінити Бажані параметри\n";
+        cout << "0 - Повернутися в головне меню\n";
+        cout << "Ваш вибір: ";
+        cin >> choice;
+
+        switch (choice) {
+        case 1: {
+            int sub;
+            cout << "--- Зовнішнє середовище ---\n";
+            cout << "1 - Температура (" << outside.temperature << "°C)\n";
+            cout << "2 - Вологість (" << outside.humidity << "%)\n";
+            cout << "3 - Якість повітря (" << outside.air_quality << ")\n";
+            cout << "4 - Тиск (" << outside.pressure << " мм рт. ст.)\n";
+            cout << "5 - Опади (" << outside.precipitation << " мм)\n";
+            cout << "6 - Вітер (" << outside.wind << " м/с)\n";
+            cout << "0 - Назад\n";
+            cout << "Ваш вибір: ";
+            cin >> sub;
+
+            switch (sub) {
+            case 1: {
+                double val;
+                cout << "Нове значення температури: ";
+                cin >> val;
+                cout << "Було: " << outside.temperature << "°C -> Стало: " << val << "°C\n";
+                outside.temperature = val;
+                changes_made = true;
+                break;
+            }
+            case 2: {
+                int val;
+                cout << "Нове значення вологості: ";
+                cin >> val;
+                cout << "Було: " << outside.humidity << "% -> Стало: " << val << "%\n";
+                outside.humidity = val;
+                changes_made = true;
+                break;
+            }
+            case 3: {
+                int val;
+                cout << "Нова якість повітря: ";
+                cin >> val;
+                cout << "Було: " << outside.air_quality << " -> Стало: " << val << "\n";
+                outside.air_quality = val;
+                changes_made = true;
+                break;
+            }
+            case 4: {
+                int val;
+                cout << "Новий тиск: ";
+                cin >> val;
+                cout << "Було: " << outside.pressure << " мм -> Стало: " << val << " мм\n";
+                outside.pressure = val;
+                changes_made = true;
+                break;
+            }
+            case 5: {
+                double val;
+                cout << "Нові опади: ";
+                cin >> val;
+                cout << "Було: " << outside.precipitation << " мм -> Стало: " << val << " мм\n";
+                outside.precipitation = val;
+                changes_made = true;
+                break;
+            }
+            case 6: {
+                double val;
+                cout << "Нова швидкість вітру: ";
+                cin >> val;
+                cout << "Було: " << outside.wind << " м/с -> Стало: " << val << " м/с\n";
+                outside.wind = val;
+                changes_made = true;
+                break;
+            }
+            }
+            break;
+        }
+        case 2: {
+            int sub;
+            cout << "--- Внутрішнє середовище ---\n";
+            cout << "1 - Температура (" << inside.temperature << "°C)\n";
+            cout << "2 - Вологість (" << inside.humidity << "%)\n";
+            cout << "3 - Якість повітря (" << inside.air_quality << ")\n";
+            cout << "0 - Назад\n";
+            cout << "Ваш вибір: ";
+            cin >> sub;
+
+            switch (sub) {
+            case 1: {
+                double val;
+                cout << "Нове значення температури: ";
+                cin >> val;
+                cout << "Було: " << inside.temperature << "°C -> Стало: " << val << "°C\n";
+                inside.temperature = val;
+                changes_made = true;
+                break;
+            }
+            case 2: {
+                int val;
+                cout << "Нове значення вологості: ";
+                cin >> val;
+                cout << "Було: " << inside.humidity << "% -> Стало: " << val << "%\n";
+                inside.humidity = val;
+                changes_made = true;
+                break;
+            }
+            case 3: {
+                int val;
+                cout << "Нова якість повітря: ";
+                cin >> val;
+                cout << "Було: " << inside.air_quality << " -> Стало: " << val << "\n";
+                inside.air_quality = val;
+                changes_made = true;
+                break;
+            }
+            }
+            break;
+        }
+        case 3: {
+            int sub;
+            cout << "--- Стан тривог ---\n";
+            cout << "1 - Цунамі (" << (alert.tsunami ? "Так" : "Ні") << ")\n";
+            cout << "2 - Лісова пожежа (" << (alert.forest_fire ? "Так" : "Ні") << ")\n";
+            cout << "3 - Землетрус (" << (alert.earthquake ? "Так" : "Ні") << ")\n";
+            cout << "4 - Шторм (" << (alert.storm ? "Так" : "Ні") << ")\n";
+            cout << "0 - Назад\n";
+            cout << "Ваш вибір: ";
+            cin >> sub;
+
+            bool val;
+            switch (sub) {
+            case 1:
+                cout << "Нове значення (0 - Ні, 1 - Так): ";
+                cin >> val;
+                cout << "Було: " << (alert.tsunami ? "Так" : "Ні") << " -> Стало: " << (val ? "Так" : "Ні") << "\n";
+                alert.tsunami = val;
+                changes_made = true;
+                break;
+            case 2:
+                cout << "Нове значення (0 - Ні, 1 - Так): ";
+                cin >> val;
+                cout << "Було: " << (alert.forest_fire ? "Так" : "Ні") << " -> Стало: " << (val ? "Так" : "Ні") << "\n";
+                alert.forest_fire = val;
+                changes_made = true;
+                break;
+            case 3:
+                cout << "Нове значення (0 - Ні, 1 - Так): ";
+                cin >> val;
+                cout << "Було: " << (alert.earthquake ? "Так" : "Ні") << " -> Стало: " << (val ? "Так" : "Ні") << "\n";
+                alert.earthquake = val;
+                changes_made = true;
+                break;
+            case 4:
+                cout << "Нове значення (0 - Ні, 1 - Так): ";
+                cin >> val;
+                cout << "Було: " << (alert.storm ? "Так" : "Ні") << " -> Стало: " << (val ? "Так" : "Ні") << "\n";
+                alert.storm = val;
+                changes_made = true;
+                break;
+            }
+            break;
+        }
+        case 4: {
+            int sub;
+            cout << "--- Бажані параметри ---\n";
+            cout << "1 - Температура (" << desired_parametres.temperature << "°C)\n";
+            cout << "2 - Вологість (" << desired_parametres.humidity << "%)\n";
+            cout << "3 - Якість повітря (" << desired_parametres.air_quality << ")\n";
+            cout << "0 - Назад\n";
+            cout << "Ваш вибір: ";
+            cin >> sub;
+
+            switch (sub) {
+            case 1: {
+                double val;
+                cout << "Нове значення температури: ";
+                cin >> val;
+                cout << "Було: " << desired_parametres.temperature << "°C -> Стало: " << val << "°C\n";
+                desired_parametres.temperature = val;
+                changes_made = true;
+                break;
+            }
+            case 2: {
+                int val;
+                cout << "Нове значення вологості: ";
+                cin >> val;
+                cout << "Було: " << desired_parametres.humidity << "% -> Стало: " << val << "%\n";
+                desired_parametres.humidity = val;
+                changes_made = true;
+                break;
+            }
+            case 3: {
+                int val;
+                cout << "Нова якість повітря: ";
+                cin >> val;
+                cout << "Було: " << desired_parametres.air_quality << " -> Стало: " << val << "\n";
+                desired_parametres.air_quality = val;
+                changes_made = true;
+                break;
+            }
+            }
+            break;
+        }
+        case 0:
+
+            /*
+            if (changes_made) {
+                //simulate(outside, inside, alert, mode_of_systems, desired_parametres);
+                maim_menu(outside, inside, alert, mode_of_systems, desired_parametres);
+            }
+            */
+            //maim_menu(outside, inside, alert, mode_of_systems, desired_parametres);
+            system("cls");
+            return;
+            break;
+        default:
+            cout << "Невірний вибір!\n";
+        }
+
+        system("pause");
+
+    }
+
+}
+
+
+void information() {
+
+    system("cls");
+    cout << "------------Iнструкцiї та iнформацiю про програму------------\n\n";
+    cout << "Вам необхiдно внести змiни в меню \"Внесiть змiни в інформацiйне зведення\"."
+        << " \nПотiм вибрати \"Почати симуляцiю\"."
+        << "Пiсля цього почнеться виконання симуляцiї "
+        << "\ni будуть автоматично внесенi необхiднi змiни для адаптацiї системи.\n\n";
+
+    cout << "Програма розроблена в рамках дипломної роботи студента НАУ\"ХАI\", Кiрiченко Д.В."
+        << " \nТема дипломної роботи: \"Розробка додатку симуляцiї поведiнки системи “Розумний будинок” з урахуванням динамiчних природних умов \".\n\n";
+    for (;;)
+    {
+        cout << "Для того щоб повернутися на головне меню введiть нуль(0):";
+        int end_num = 1;
+        cin >> end_num;
+        if (end_num == 0)
+        {
+            system("cls");
+            break;
+        }
+    }
+}
+
+void error() {
+    cout << "Некоректний вибір, спробуйте ще раз\n";
+}
+
+void change_system_status(operating_mode_of_systems& mode_of_systems) {
+
+    system("cls");
+    int choice;
+    bool editing = true;
+
+    while (editing) {
+        system("cls");
+        cout << "===== Редагування статусу систем =====\n";
+        cout << "Оберіть параметр для змiни (введіть номер):\n";
+        cout << "1. Газ (зараз: " << (mode_of_systems.gas ? "On" : "Off") << ")\n";
+        cout << "2. Вода (зараз: " << (mode_of_systems.water ? "On" : "Off") << ")\n";
+        cout << "3. Електрика (зараз: " << (mode_of_systems.electricity ? "On" : "Off") << ")\n";
+        cout << "4. Генератор (зараз: " << (mode_of_systems.generator ? "On" : "Off") << ")\n";
+        cout << "5. Насос у підвалі (зараз: " << (mode_of_systems.basement_water_pump ? "On" : "Off") << ")\n";
+        cout << "6. Дренажна система (зараз: " << (mode_of_systems.drainage_system ? "On" : "Off") << ")\n";
+        cout << "7. Забір повітря з вулиці (зараз: " << (mode_of_systems.street_air_intake ? "On" : "Off") << ")\n";
+        cout << "8. Вентиляція без забору повітря (зараз: " << (mode_of_systems.room_ventilation_without_air_intake ? "On" : "Off") << ")\n";
+        cout << "9. Опалення кімнати 1 (зараз: " << (mode_of_systems.heating[0] ? "On" : "Off") << ")\n";
+        cout << "10. Охолодження кімнати 1 (зараз: " << (mode_of_systems.room_cooling[0] ? "On" : "Off") << ")\n";
+        cout << "11. Регулювання вологості кімнати 1 (зараз: " << (mode_of_systems.humidity_regulation[0] ? "On" : "Off") << ")\n";
+        cout << "12. Вікна кімнати 1 (зараз: " << (mode_of_systems.windows[0] ? "On" : "Off") << ")\n";
+        cout << "13. Двері кімнати 1 (зараз: " << (mode_of_systems.doors[0] ? "On" : "Off") << ")\n";
+        cout << "0. Завершити редагування\n";
+        cout << "Ваш вибір: ";
+        cin >> choice;
+
+        bool* target = nullptr;
+
+        switch (choice) {
+        case 1: target = &mode_of_systems.gas; break;
+        case 2: target = &mode_of_systems.water; break;
+        case 3: target = &mode_of_systems.electricity; break;
+        case 4: target = &mode_of_systems.generator; break;
+        case 5: target = &mode_of_systems.basement_water_pump; break;
+        case 6: target = &mode_of_systems.drainage_system; break;
+        case 7: target = &mode_of_systems.street_air_intake; break;
+        case 8: target = &mode_of_systems.room_ventilation_without_air_intake; break;
+        case 9: target = &mode_of_systems.heating[0]; break;
+        case 10: target = &mode_of_systems.room_cooling[0]; break;
+        case 11: target = &mode_of_systems.humidity_regulation[0]; break;
+        case 12: target = &mode_of_systems.windows[0]; break;
+        case 13: target = &mode_of_systems.doors[0]; break;
+        case 0:
+            editing = false;
+            continue;
+        default:
+            cout << "Некоректний вибір. Спробуйте ще раз.\n";
+            system("pause");
+            continue;
+        }
+
+        cout << "Введiть нове значення (1 - Увiмкнути / 0 - Вимкнути): ";
+        int new_value;
+        cin >> new_value;
+
+        if (new_value == 0 || new_value == 1) {
+            bool old_value = *target;
+            *target = (bool)new_value;
+            cout << "Значення змінено: було [" << (old_value ? "On" : "Off") << "] → стало [" << (*target ? "On" : "Off") << "]\n";
+        }
+        else {
+            cout << "Некоректне значення! Можна лише 0 або 1.\n";
+        }
+
+        system("pause");
+    }
+    system("cls");
+
+
+}
+
+
+void information_templates(condition_outside& outside, condition_inside& inside, emergency_alert& alert, operating_mode_of_systems& mode_of_systems, condition_inside& desired_parametres) {
+
+    for (;;) {
+        system("cls");
+        cout << "------------Шаблони інформаційних зведень------------\n";
+        cout << "  Шаблони параметрів та станів підсистем Розумного будинку\n"
+            << "створені заздалегідь, щоб більш наглядно та детально\n"
+            << "продемонструвати адаптаційни алгоритм системи Розумного \n"
+            << "будинку, його роботу та реакцію на динамічні зміни.\n"
+            << "навколишнього середовища.\n\nНазва шаблона - кейс, для якого цей щаблон карще за все підходить.\n ";
+
+        cout << "Шаблони:\n"
+            << "1 - Цунамі\n"
+            << "2 - Землетрус\n"
+            << "3 - Шторм\n"
+            << "4 - Лісова пожежа\n"
+            << "5 - Дощ\n"
+            << "6 - Спека\n"
+            << "7 - Холод ззовні дому\n"
+            << "8 - Холод в домі\n"
+            << "9 - Якість повітря погана в домі\n"
+            << "10 - Якість повітря погана ззовні\n"
+            << "11 - Вологість велика в домі\n"
+            << "12 - Вологість велика ззовні\n"
+            << "0 - Повернутися в головне меню\n"
+            << "Введіть номер шаблону: ";
+
+        int choice;
+        cin >> choice;
+
+
+        system("cls");
+
+        switch (choice) {
+        case 1: {
+            {
+
+                inside.temperature = 38;
+                inside.humidity = 66;
+                inside.air_quality = 99;
+
+                desired_parametres.temperature = 20;
+                desired_parametres.humidity = 20;
+                desired_parametres.air_quality = 15;
+
+
+                outside.temperature = 17;
+                outside.humidity = 32;
+                outside.air_quality = 21;
+                outside.pressure = 760;
+                outside.precipitation = 0;
+                outside.wind = 0;
+
+                alert.tsunami = 1;
+                alert.forest_fire = 0;
+                alert.earthquake = 0;
+                alert.storm = 0;
+
+                mode_of_systems.gas = 1;
+                mode_of_systems.water = 1;
+                mode_of_systems.electricity = 1;
+                mode_of_systems.generator = 0;
+                mode_of_systems.windows[0] = 1;
+                mode_of_systems.doors[0] = 1;
+                mode_of_systems.basement_water_pump = 0;
+                mode_of_systems.drainage_system = 0;
+                mode_of_systems.street_air_intake = 1;
+                mode_of_systems.room_ventilation_without_air_intake = 1;
+                mode_of_systems.heating[0] = 1;
+                mode_of_systems.room_cooling[0] = 1;
+                mode_of_systems.humidity_regulation[0] = 1;
+
+            }
+            cout << "- Вибраний шаблон додано до інформаційного зведення\n";
+            cout << "Оновлене інформаційне зведення:\n";
+            print_table(outside, inside, alert, mode_of_systems, desired_parametres);
+            break;
+        }
+        case 2: {
+            {
+                inside.temperature = 38;
+                inside.humidity = 20;
+                inside.air_quality = 30;
+
+                desired_parametres.temperature = 20;
+                desired_parametres.humidity = 20;
+                desired_parametres.air_quality = 50;
+
+
+                outside.temperature = 17;
+                outside.humidity = 32;
+                outside.air_quality = 21;
+                outside.pressure = 760;
+                outside.precipitation = 0;
+                outside.wind = 0;
+
+                alert.tsunami = 0;
+                alert.forest_fire = 0;
+                alert.earthquake = 1;
+                alert.storm = 0;
+
+                mode_of_systems.gas = 1;
+                mode_of_systems.water = 1;
+                mode_of_systems.electricity = 1;
+                mode_of_systems.generator = 0;
+                mode_of_systems.windows[0] = 0;
+                mode_of_systems.doors[0] = 0;
+                mode_of_systems.basement_water_pump = 1;
+                mode_of_systems.drainage_system = 1;
+                mode_of_systems.street_air_intake = 1;
+                mode_of_systems.room_ventilation_without_air_intake = 1;
+                mode_of_systems.heating[0] = 1;
+                mode_of_systems.room_cooling[0] = 1;
+                mode_of_systems.humidity_regulation[0] = 1;
+            }
+            cout << "- Вибраний шаблон додано до інформаційного зведення\n";
+            cout << "Оновлене інформаційне зведення:\n";
+            print_table(outside, inside, alert, mode_of_systems, desired_parametres);
+            break;
+        }
+        case 3: {
+            {
+                inside.temperature = 38;
+                inside.humidity = 66;
+                inside.air_quality = 99;
+
+                desired_parametres.temperature = 20;
+                desired_parametres.humidity = 20;
+                desired_parametres.air_quality = 15;
+
+
+                outside.temperature = 17;
+                outside.humidity = 32;
+                outside.air_quality = 21;
+                outside.pressure = 760;
+                outside.precipitation = 0;
+                outside.wind = 0;
+
+                alert.tsunami = 0;
+                alert.forest_fire = 0;
+                alert.earthquake = 0;
+                alert.storm = 1;
+
+                mode_of_systems.gas = 1;
+                mode_of_systems.water = 1;
+                mode_of_systems.electricity = 1;
+                mode_of_systems.generator = 0;
+                mode_of_systems.windows[0] = 1;
+                mode_of_systems.doors[0] = 1;
+                mode_of_systems.basement_water_pump = 0;
+                mode_of_systems.drainage_system = 0;
+                mode_of_systems.street_air_intake = 0;
+                mode_of_systems.room_ventilation_without_air_intake = 0;
+                mode_of_systems.heating[0] = 0;
+                mode_of_systems.room_cooling[0] = 0;
+                mode_of_systems.humidity_regulation[0] = 0;
+            }
+            cout << "- Вибраний шаблон додано до інформаційного зведення\n";
+            cout << "Оновлене інформаційне зведення:\n";
+            print_table(outside, inside, alert, mode_of_systems, desired_parametres);
+            break;
+        }
+        case 4: {
+            {
+                inside.temperature = 38;
+                inside.humidity = 66;
+                inside.air_quality = 99;
+
+                desired_parametres.temperature = 20;
+                desired_parametres.humidity = 20;
+                desired_parametres.air_quality = 15;
+
+
+                outside.temperature = 17;
+                outside.humidity = 32;
+                outside.air_quality = 21;
+                outside.pressure = 760;
+                outside.precipitation = 0;
+                outside.wind = 0;
+
+                alert.tsunami = 0;
+                alert.forest_fire = 1;
+                alert.earthquake = 0;
+                alert.storm = 0;
+
+                mode_of_systems.gas = 1;
+                mode_of_systems.water = 1;
+                mode_of_systems.electricity = 1;
+                mode_of_systems.generator = 0;
+                mode_of_systems.windows[0] = 1;
+                mode_of_systems.doors[0] = 1;
+                mode_of_systems.basement_water_pump = 0;
+                mode_of_systems.drainage_system = 0;
+                mode_of_systems.street_air_intake = 1;
+                mode_of_systems.room_ventilation_without_air_intake = 0;
+                mode_of_systems.heating[0] = 0;
+                mode_of_systems.room_cooling[0] = 0;
+                mode_of_systems.humidity_regulation[0] = 0;
+            }
+            cout << "- Вибраний шаблон додано до інформаційного зведення\n";
+            cout << "Оновлене інформаційне зведення:\n";
+            print_table(outside, inside, alert, mode_of_systems, desired_parametres);
+            break;
+        }
+        case 5: {
+            {
+                inside.temperature = 15;
+                inside.humidity = 30;
+                inside.air_quality = 30;
+
+                desired_parametres.temperature = 20;
+                desired_parametres.humidity = 20;
+                desired_parametres.air_quality = 30;
+
+
+                outside.temperature = 17;
+                outside.humidity = 32;
+                outside.air_quality = 21;
+                outside.pressure = 760;
+                outside.precipitation = 7;
+                outside.wind = 4;
+
+                alert.tsunami = 0;
+                alert.forest_fire = 0;
+                alert.earthquake = 0;
+                alert.storm = 0;
+
+                mode_of_systems.gas = 1;
+                mode_of_systems.water = 1;
+                mode_of_systems.electricity = 1;
+                mode_of_systems.generator = 0;
+                mode_of_systems.windows[0] = 1;
+                mode_of_systems.doors[0] = 1;
+                mode_of_systems.basement_water_pump = 0;
+                mode_of_systems.drainage_system = 0;
+                mode_of_systems.street_air_intake = 1;
+                mode_of_systems.room_ventilation_without_air_intake = 0;
+                mode_of_systems.heating[0] = 0;
+                mode_of_systems.room_cooling[0] = 0;
+                mode_of_systems.humidity_regulation[0] = 0;
+            }
+            cout << "- Вибраний шаблон додано до інформаційного зведення\n";
+            cout << "Оновлене інформаційне зведення:\n";
+            print_table(outside, inside, alert, mode_of_systems, desired_parametres);
+            break;
+        }
+        case 6: {
+            {
+                inside.temperature = 23;
+                inside.humidity = 30;
+                inside.air_quality = 30;
+
+                desired_parametres.temperature = 20;
+                desired_parametres.humidity = 20;
+                desired_parametres.air_quality = 30;
+
+
+                outside.temperature = 30;
+                outside.humidity = 32;
+                outside.air_quality = 40;
+                outside.pressure = 760;
+                outside.precipitation = 0;
+                outside.wind = 1;
+
+                alert.tsunami = 0;
+                alert.forest_fire = 0;
+                alert.earthquake = 0;
+                alert.storm = 0;
+
+                mode_of_systems.gas = 1;
+                mode_of_systems.water = 1;
+                mode_of_systems.electricity = 1;
+                mode_of_systems.generator = 0;
+                mode_of_systems.windows[0] = 1;
+                mode_of_systems.doors[0] = 1;
+                mode_of_systems.basement_water_pump = 0;
+                mode_of_systems.drainage_system = 0;
+                mode_of_systems.street_air_intake = 1;
+                mode_of_systems.room_ventilation_without_air_intake = 0;
+                mode_of_systems.heating[0] = 0;
+                mode_of_systems.room_cooling[0] = 0;
+                mode_of_systems.humidity_regulation[0] = 0;
+            }
+            cout << "- Вибраний шаблон додано до інформаційного зведення\n";
+            cout << "Оновлене інформаційне зведення:\n";
+            print_table(outside, inside, alert, mode_of_systems, desired_parametres);
+            break;
+        }
+        case 7: {
+            {
+                inside.temperature = 17;
+                inside.humidity = 30;
+                inside.air_quality = 30;
+
+                desired_parametres.temperature = 20;
+                desired_parametres.humidity = 20;
+                desired_parametres.air_quality = 30;
+
+
+                outside.temperature = 8;
+                outside.humidity = 32;
+                outside.air_quality = 40;
+                outside.pressure = 760;
+                outside.precipitation = 0;
+                outside.wind = 0.5;
+
+                alert.tsunami = 0;
+                alert.forest_fire = 0;
+                alert.earthquake = 0;
+                alert.storm = 0;
+
+                mode_of_systems.gas = 1;
+                mode_of_systems.water = 1;
+                mode_of_systems.electricity = 1;
+                mode_of_systems.generator = 0;
+                mode_of_systems.windows[0] = 1;
+                mode_of_systems.doors[0] = 1;
+                mode_of_systems.basement_water_pump = 0;
+                mode_of_systems.drainage_system = 0;
+                mode_of_systems.street_air_intake = 1;
+                mode_of_systems.room_ventilation_without_air_intake = 0;
+                mode_of_systems.heating[0] = 0;
+                mode_of_systems.room_cooling[0] = 0;
+                mode_of_systems.humidity_regulation[0] = 0;
+            }
+            cout << "- Вибраний шаблон додано до інформаційного зведення\n";
+            cout << "Оновлене інформаційне зведення:\n";
+            print_table(outside, inside, alert, mode_of_systems, desired_parametres);
+            break;
+        }
+        case 8: {
+            {
+                inside.temperature = 15;
+                inside.humidity = 30;
+                inside.air_quality = 30;
+
+                desired_parametres.temperature = 22;
+                desired_parametres.humidity = 20;
+                desired_parametres.air_quality = 30;
+
+
+                outside.temperature = 24;
+                outside.humidity = 32;
+                outside.air_quality = 40;
+                outside.pressure = 760;
+                outside.precipitation = 0;
+                outside.wind = 0.5;
+
+                alert.tsunami = 0;
+                alert.forest_fire = 0;
+                alert.earthquake = 0;
+                alert.storm = 0;
+
+                mode_of_systems.gas = 1;
+                mode_of_systems.water = 1;
+                mode_of_systems.electricity = 1;
+                mode_of_systems.generator = 0;
+                mode_of_systems.windows[0] = 0;
+                mode_of_systems.doors[0] = 0;
+                mode_of_systems.basement_water_pump = 0;
+                mode_of_systems.drainage_system = 0;
+                mode_of_systems.street_air_intake = 0;
+                mode_of_systems.room_ventilation_without_air_intake = 1;
+                mode_of_systems.heating[0] = 0;
+                mode_of_systems.room_cooling[0] = 1;
+                mode_of_systems.humidity_regulation[0] = 0;
+            }
+            cout << "- Вибраний шаблон додано до інформаційного зведення\n";
+            cout << "Оновлене інформаційне зведення:\n";
+            print_table(outside, inside, alert, mode_of_systems, desired_parametres);
+            break;
+        }
+        case 9: {
+            {
+                inside.temperature = 20;
+                inside.humidity = 30;
+                inside.air_quality = 90;
+
+                desired_parametres.temperature = 20;
+                desired_parametres.humidity = 20;
+                desired_parametres.air_quality = 30;
+
+
+                outside.temperature = 19;
+                outside.humidity = 32;
+                outside.air_quality = 15;
+                outside.pressure = 760;
+                outside.precipitation = 0;
+                outside.wind = 0.5;
+
+                alert.tsunami = 0;
+                alert.forest_fire = 0;
+                alert.earthquake = 0;
+                alert.storm = 0;
+
+                mode_of_systems.gas = 1;
+                mode_of_systems.water = 1;
+                mode_of_systems.electricity = 1;
+                mode_of_systems.generator = 0;
+                mode_of_systems.windows[0] = 0;
+                mode_of_systems.doors[0] = 0;
+                mode_of_systems.basement_water_pump = 0;
+                mode_of_systems.drainage_system = 0;
+                mode_of_systems.street_air_intake = 0;
+                mode_of_systems.room_ventilation_without_air_intake = 1;
+                mode_of_systems.heating[0] = 0;
+                mode_of_systems.room_cooling[0] = 0;
+                mode_of_systems.humidity_regulation[0] = 0;
+            }
+            cout << "- Вибраний шаблон додано до інформаційного зведення\n";
+            cout << "Оновлене інформаційне зведення:\n";
+            print_table(outside, inside, alert, mode_of_systems, desired_parametres);
+            break;
+        }
+        case 10: {
+            {
+                inside.temperature = 20;
+                inside.humidity = 20;
+                inside.air_quality = 30;
+
+                desired_parametres.temperature = 20;
+                desired_parametres.humidity = 20;
+                desired_parametres.air_quality = 30;
+
+
+                outside.temperature = 8;
+                outside.humidity = 32;
+                outside.air_quality = 60;
+                outside.pressure = 760;
+                outside.precipitation = 0;
+                outside.wind = 0.5;
+
+                alert.tsunami = 0;
+                alert.forest_fire = 0;
+                alert.earthquake = 0;
+                alert.storm = 0;
+
+                mode_of_systems.gas = 1;
+                mode_of_systems.water = 1;
+                mode_of_systems.electricity = 1;
+                mode_of_systems.generator = 0;
+                mode_of_systems.windows[0] = 1;
+                mode_of_systems.doors[0] = 1;
+                mode_of_systems.basement_water_pump = 0;
+                mode_of_systems.drainage_system = 0;
+                mode_of_systems.street_air_intake = 1;
+                mode_of_systems.room_ventilation_without_air_intake = 0;
+                mode_of_systems.heating[0] = 0;
+                mode_of_systems.room_cooling[0] = 0;
+                mode_of_systems.humidity_regulation[0] = 0;
+            }
+            cout << "- Вибраний шаблон додано до інформаційного зведення\n";
+            cout << "Оновлене інформаційне зведення:\n";
+            print_table(outside, inside, alert, mode_of_systems, desired_parametres);
+            break;
+        }
+        case 11: {
+            {
+                inside.temperature = 17;
+                inside.humidity = 60;
+                inside.air_quality = 30;
+
+                desired_parametres.temperature = 20;
+                desired_parametres.humidity = 20;
+                desired_parametres.air_quality = 30;
+
+
+                outside.temperature = 8;
+                outside.humidity = 12;
+                outside.air_quality = 40;
+                outside.pressure = 760;
+                outside.precipitation = 0;
+                outside.wind = 0.5;
+
+                alert.tsunami = 0;
+                alert.forest_fire = 0;
+                alert.earthquake = 0;
+                alert.storm = 0;
+
+                mode_of_systems.gas = 1;
+                mode_of_systems.water = 1;
+                mode_of_systems.electricity = 1;
+                mode_of_systems.generator = 0;
+                mode_of_systems.windows[0] = 0;
+                mode_of_systems.doors[0] = 0;
+                mode_of_systems.basement_water_pump = 0;
+                mode_of_systems.drainage_system = 0;
+                mode_of_systems.street_air_intake = 0;
+                mode_of_systems.room_ventilation_without_air_intake = 0;
+                mode_of_systems.heating[0] = 0;
+                mode_of_systems.room_cooling[0] = 0;
+                mode_of_systems.humidity_regulation[0] = 0;
+            }
+            cout << "- Вибраний шаблон додано до інформаційного зведення\n";
+            cout << "Оновлене інформаційне зведення:\n";
+            print_table(outside, inside, alert, mode_of_systems, desired_parametres);
+            break;
+        }
+        case 12: {
+            {
+                inside.temperature = 17;
+                inside.humidity = 30;
+                inside.air_quality = 30;
+
+                desired_parametres.temperature = 20;
+                desired_parametres.humidity = 30;
+                desired_parametres.air_quality = 30;
+
+
+                outside.temperature = 8;
+                outside.humidity = 72;
+                outside.air_quality = 40;
+                outside.pressure = 760;
+                outside.precipitation = 0;
+                outside.wind = 0.5;
+
+                alert.tsunami = 0;
+                alert.forest_fire = 0;
+                alert.earthquake = 0;
+                alert.storm = 0;
+
+                mode_of_systems.gas = 1;
+                mode_of_systems.water = 1;
+                mode_of_systems.electricity = 1;
+                mode_of_systems.generator = 0;
+                mode_of_systems.windows[0] = 1;
+                mode_of_systems.doors[0] = 1;
+                mode_of_systems.basement_water_pump = 0;
+                mode_of_systems.drainage_system = 0;
+                mode_of_systems.street_air_intake = 1;
+                mode_of_systems.room_ventilation_without_air_intake = 0;
+                mode_of_systems.heating[0] = 0;
+                mode_of_systems.room_cooling[0] = 0;
+                mode_of_systems.humidity_regulation[0] = 0;
+            }
+            cout << "- Вибраний шаблон додано до інформаційного зведення\n";
+            cout << "Оновлене інформаційне зведення:\n";
+            print_table(outside, inside, alert, mode_of_systems, desired_parametres);
+            break;
+        }
+        case 0:
+
+            system("cls");
+            return;
+            break;
+        default:
+            cout << "Невірний вибір!\n";
+        }
+
+        system("pause");
+
+
+
+    //system("pause");
+    }
+}
+
+void main_menu(condition_outside& outside, condition_inside& inside, emergency_alert& alert, operating_mode_of_systems& mode_of_systems, condition_inside& desired_parametres) {
+    system("cls");
+    cout << "============Simulation program============\n";
+    cout << "  Додаток симуляції поведінки системи “Розумний \n" <<
+        "будинок” з урахуванням динамічних природних умов\n\n";
+
+    for (;;)
+    {
+        //system("cls");
+        cout << "------------Головне меню------------\n";
+        cout << "1 - Інформаційне зведення. \n2 - Внесіть зміни в інформаційне зведення.\n3 - Внесення змін в статус системи.\n"
+            << "4 - Розпочати симуляцію. \n5 - Шаблони інформаційних зведень. \n6 - Отримати інструкції та інформацію про програму. \n7 - Завершіть виконання програми." << "\n Введіть обраний номер:";
+
+        int main_menu_num;
+        cin >> main_menu_num;
+
+        bool end = 0;
+
+        switch (main_menu_num) {
+        case 1:
+            system("cls");
+            print_table(outside, inside, alert, mode_of_systems, desired_parametres);
+            break;
+        case 2:
+            changes(outside, inside, alert, mode_of_systems, desired_parametres);
+            break;
+        case 3:
+            change_system_status(mode_of_systems);
+            break;
+        case 4:
+            simulate(outside, inside, alert, mode_of_systems, desired_parametres);
+            break;
+        case 5:
+            information_templates(outside, inside, alert, mode_of_systems, desired_parametres); // шаблони інформаційних зведень 
+            break;
+        case 6:
+            information();
+            break;
+        case 7:
+            end = 1;
+            break;
+        default:
+            system("cls");
+            error();
+            break;
+        }
+
+        if (end == 1)
+            break;
+
+    }
+
+    //print_table(outside, inside, alert, mode_of_systems, desired_parametres);
+}
+
+
+int main() {
+
+    setlocale(LC_ALL, "Ukrainian");
+    //setlocale(LC_ALL, "Russian");
+
+
+    condition_inside inside;
+    condition_inside desired_parametres;
+    condition_outside outside;
+    emergency_alert alert;
+    operating_mode_of_systems mode_of_systems;
+
+    system_initialization(outside, inside, alert, mode_of_systems, desired_parametres);
+
+
+    main_menu(outside, inside, alert, mode_of_systems, desired_parametres);
+
+
+    return 0;
+}
